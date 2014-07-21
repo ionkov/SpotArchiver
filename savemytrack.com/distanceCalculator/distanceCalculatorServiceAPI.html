@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+    <script language="JavaScript" type="text/javascript">
+      window.addEventListener("load", eventWindowLoaded, false);
+      function eventWindowLoaded() {
+	  distanceCalculatorApp();
+      }
+
+      function distanceCalculatorApp() {
+	  var batch_size = 1;
+	  var sleep_time = 150; // 10 seconds
+
+	  var button = document.getElementById("buttonGo");
+	  button.addEventListener("click", fetchData, false);
+	  
+
+	  function fetchData() {
+	      var originElement = document.getElementById("originElement");
+	      var origins = parseAddress(originElement.value.split("\n"));
+
+	      var destinationElement = document.getElementById("destinationElement");
+	      var destinations = parseAddress(destinationElement.value.split("\n"));
+
+	      var serviceCallNum = 0;
+	      for (var i = 0; i < origins.length; i += batch_size) {
+		  for (var j = 0; j < destinations.length; j += batch_size) {
+		      var originBatch = origins.slice(i, Math.min(i + batch_size, origins.length));
+		      var destinationBatch = destinations.slice(j, Math.min(j + batch_size, destinations.length));
+
+		      // Queue the function executions each call to be sleep_time interval longer.
+		      delayExecution(sleep_time * serviceCallNum, getDistance, originBatch, destinationBatch);
+
+		      serviceCallNum++;
+		  }
+	      }
+
+	      logMessage("Enqueued " + serviceCallNum + " batch calls.  Executing one every " + sleep_time/1000 + " seconds<br>");
+	      logMessage("origin | destination | distance (miles) | distance (feet) | human readable time | time (seconds)<br>");
+	  }
+
+
+	  function parseAddress(addressArr) {
+	      var latlngArr = [];
+	      for (var i = 0; i < addressArr.length; i++) {
+		  var latlng = addressArr[i].split(",", 2);
+		  var lat = latlng[0];
+		  var lng = latlng[1];
+		  var latlngObj = new google.maps.LatLng(lat, lng);
+		  latlngArr.push(latlngObj);
+	      }
+	      return latlngArr
+	  }
+
+
+	  function getDistance(origins, destinations) {
+	      var service = new google.maps.DistanceMatrixService();
+
+	      // Docs: https://developers.google.com/maps/documentation/javascript/distancematrix
+	      service.getDistanceMatrix(
+		  {
+		      origins: origins,
+		      destinations: destinations,
+		      travelMode: google.maps.TravelMode.DRIVING,
+		      unitSystem: google.maps.UnitSystem.IMPERIAL,
+		  }, function(response, status) {
+		      processData(response, status, origins, destinations);
+		  });
+	  }
+
+	  
+	  // Code example how to process the data:
+	  // https://developers.google.com/maps/documentation/javascript/examples/distance-matrix
+	  function processData(response, status, originsE, destinationsE) {
+	      if (status != google.maps.DistanceMatrixStatus.OK) {
+		  logMessage("ERROR:  " + status + " | " + round(originLatLng.lat()) + "," + round(originLatLng.lng()) + " | " + 
+			      round(destinationLatLng.lat()) + "," + round(destinationLatLng.lng()) +  "<br>");
+		  return;
+	      } 
+
+	      var origins = response.originAddresses;
+	      var destinations = response.destinationAddresses;
+
+	      for (var i = 0; i < origins.length; i++) {
+		  var results = response.rows[i].elements;
+		  for (var j = 0; j < results.length; j++) {
+		      if (results[j] != undefined && results[j].distance != undefined && results[j].duration != undefined) {
+			  var originLatLng = originsE[0];
+			  var destinationLatLng = destinationsE[0];
+
+			  var str = round(originLatLng.lat()) + "," + round(originLatLng.lng()) + " | " + 
+			      round(destinationLatLng.lat()) + "," + round(destinationLatLng.lng()) + " | " + 
+			      results[j].distance.text + " | " + results[j].distance.value + " | " +
+			      results[j].duration.text + " | " + results[j].duration.value + "<br>";
+			  logMessage(str);
+		      }
+		  }
+	      }
+
+	      // Do not Delete!  Uncomment this to see how the JSON looks exactly.
+	      // logMessage("return object:" + JSON.stringify(response, undefined, 2));
+	  }
+
+
+	  function round(num) {
+	      var precision = 10000000;
+	      var rounded = Math.round(num * precision) / precision; 
+	      return rounded;
+	  }
+
+	  function logMessage(message) {
+	      document.getElementById('log').innerHTML += message;
+	  }
+	  
+
+	  function delayExecution(millis, callback, param1, param2) {
+	      setTimeout(function() {  
+		  callback(param1, param2); 
+	      }, millis);
+	  }
+      }
+    </script>
+    <meta charset="UTF-8">
+    <title>Many to Many Distance and Timebetween</title>
+  </head>
+  <body>
+    <div>
+      <form>
+	<textarea id="originElement" rows="20" cols="40">ORIGIN lat,long one per line...</textarea>
+	<textarea id="destinationElement" rows="20" cols="40">DESTINATION lat,long one per line...</textarea>
+	<br>
+	<button type="button"  id="buttonGo">Go</button>
+	<br>
+      </form>  
+    </div>
+    <div id="log" width="100%" height="800" style="bgcolor=#ffffaa"></div>
+  </body>
+</html>

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.5.3/modernizr.min.js"></script>
+    <script language="JavaScript" type="text/javascript">
+      window.addEventListener("load", eventWindowLoaded, false);
+      function canvasSupport () {
+	  return Modernizr.canvas;
+      }
+
+      function eventWindowLoaded() {
+	  canvasApp();
+      }
+
+      function canvasApp() {
+	  
+	  var message = "https://maps.googleapis.com/maps/api/distancematrix/xml?origins=37.7954971,-122.4135966&destinations=37.7927189,-122.3919872&mode=driving&key=AIzaSyAWeL-6VyFiE_QAS5x53GNKmv1PIvm-fAY";
+	  
+	  if (!canvasSupport()) {
+	      return;
+	  }
+	  
+	  var theCanvas = document.getElementById("canvasOutput");
+	  var context = theCanvas.getContext("2d"); 
+	  
+	  var formElement = document.getElementById("apiKey");
+	  formElement.addEventListener("change", textBoxChanged, false);
+	  
+	  drawScreen();
+
+	  function drawScreen() {
+	      //Background
+	      context.fillStyle = "#ffffaa";
+	      context.fillRect(0, 0, theCanvas.width, theCanvas.height);
+	      //Box
+	      context.strokeStyle = "#000000"; 
+	      context.strokeRect(5,  5, theCanvas.width-10, theCanvas.height-10);
+	      
+	      //Text
+	      context.font = "12px serif" 
+	      
+	      var metrics = context.measureText(message);
+	      var textWidth = metrics.width;
+	      var xPosition = (theCanvas.width/2) - (textWidth/2);
+	      var yPosition = (theCanvas.height/2);
+	      
+	      context.fillStyle = "#FF0000";
+	      context.fillText(message, xPosition ,yPosition);
+	  }
+	  
+	  function textBoxChanged(e) {
+	      var target =  e.target;
+	      message = target.value;
+	      drawScreen();
+	  }
+      }
+    </script>
+    <meta charset="UTF-8">
+    <title>Many to Many Distance and Timebetween</title>
+  </head>
+  <body>
+    <div>
+      <form>
+	Distance Matrix Google API Key: <input id="apiKey" placeholder="AIzaSyAWeL-6VyFiE_QAS5x53GNKmv1PIvm-fAY" />
+	<br>
+	<textarea id="source" rows="20" cols="40">ORIGIN lat,long one per line...</textarea>
+	<textarea id="destination" rows="20" cols="40">DESTINATION lat,long one per line...</textarea>
+	<br>
+	<br>
+      </form>  
+
+      <canvas id="canvasOutput" width="800" height="800">
+	Your browser does not support HTML 5 Canvas. 
+      </canvas>
+    </div>
+  </body>
+</html>
+
+
+

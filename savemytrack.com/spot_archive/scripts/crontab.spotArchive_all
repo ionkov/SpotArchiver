@@ -1,0 +1,21 @@
+MAILTO=ionkov@gmail.com
+
+# Slurp all new events from the SPOT server at the beginning of every minute.
+00 */1 * * * /home/gionkov/savemytrack.com/public/spot_archive/scripts/spotArchiver.pl > /dev/null
+
+# Import all new events into the json database.
+05 */1 * * * /home/gionkov/savemytrack.com/public/spot_archive/scripts/database_aggregator.pl
+
+# Update the most recent N kml map. 
+10 */1 * * * /home/gionkov/savemytrack.com/public/spot_archive/scripts/database_publisher.pl
+
+
+
+# Slurp all new events from the SPOT server at the beginning of every minute.
+00 */1 * * * /home/gionkov/road-adventure.com/public/spot_archive/scripts/spotArchiver.pl > /dev/null
+
+# Import all new events into the json database.
+05 */1 * * * /home/gionkov/road-adventure.com/public/spot_archive/scripts/database_aggregator.pl
+
+# Update the most recent N kml map. 
+10 */1 * * * /home/gionkov/road-adventure.com/public/spot_archive/scripts/database_publisher.pl

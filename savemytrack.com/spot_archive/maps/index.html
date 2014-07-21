@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+  <style type="text/css">
+    .current-location-style { 
+	padding:5px; 
+	font-size:1.0em; 
+	background-color:light-yellow; 
+	font-family: 'Open Sans',sans-serif; 
+    }
+  </style>
+
+  <script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+  <script language="JavaScript" type="text/javascript">
+    $(document).ready(function() {
+	$.ajax({
+	    type: "GET",
+	    url: "current_location.csv",
+	    contentType: "text/csv",
+	    success: function(data) { processData(data); }
+	});
+    });
+    
+    function processData(dataStr) {
+	var data = dataStr.split(/\n/g);
+	document.getElementById('current-location-div').innerHTML = data[0] + "<br>" + data[1];
+    }
+  </script>
+
+    <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <title>Serhad's Caribbean Adventure</title>
+    </head>
+
+<body>
+  <li>Serhad's Caribbean Adventure ... </li>
+  <ul>
+    <li><a href="livePath.html">See Serhad's progress today</a></li>
+    <li><a href="fullPath.html">See Serhad's full path</a></li>
+    <li><a href="full_trip_coordinates.csv">Download GPS coordinates (csv file: lat,long,epoch time)</a></li>
+    <li>Location: <div id="current-location-div" class="current-location-style"></div></li>
+  </ul>
+</body>
+</html>
+
