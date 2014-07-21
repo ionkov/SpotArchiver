@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 ###
 # @date: 07/25/2013
-# @author: Georgi Ionkov
+# @author: George Ionkov
 # 
 # This script reads all temporary json files extracted from the SPOT server,
 # strips all the unnecessary encoding returned from SPOT and imports them into 
